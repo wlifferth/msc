@@ -18,6 +18,7 @@ urls = urls.sample(n=sample_num)['url']
 count = 0
 
 outfile = open('data/medium_samples.csv', 'a+')
+error_log = open('logs/download_medium.logs', 'a+')
 
 for url in urls:
     try:
@@ -30,8 +31,7 @@ for url in urls:
                 count += 1
                 outfile.write(sample + '\n')
         print("{} total samples".format(count), " "*20, end='\r')
-    except:
-        pass
+    except Exception as e:
+        error_log.write(str(e))
 
-samples_dict = {'url': sample_urls, 'sample': samples}
-pd.DataFrame(samples_dict).to_csv('data/medium_samples.csv')
+print("Run finished. {} total samples downloaded and added to {}".format(count, outfile.name), " "*20)
