@@ -2,3 +2,6 @@
 .ipynb_checkpoints
 data
 logs
+glove
+archive
+__pycache__
