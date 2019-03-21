@@ -5,11 +5,41 @@ body {
     color: white;
 }
 
-textarea {
+input {
     border: none;
     border-bottom: 5px solid white;
     background-color: inherit;
     resize: none;
     font-size: 24px;
     color: white;
+}
+
+body {
+    padding: 10px;
+}
+
+.row {
+    padding: 20px;
+}
+
+.btn {
+    padding: 10px;
+    border-radius: 3px;
+    background-color: white;
+    -webkit-box-shadow: 0px 2px 5px -1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 2px 5px -1px rgba(0,0,0,0.75);
+    box-shadow: 0px 2px 5px -1px rgba(0,0,0,0.75);
+}
+
+#main-text-input {
+    width: 100%;
+    
+}
+
+#main-text-input:focus {
+    outline: none;
+}
+
+#main-form {
+    width: 100%;
 }

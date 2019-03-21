@@ -1,15 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="mui-container">
-    <form action="/" method="POST">
-        <textarea name="text"></textarea>
-        <input type="submit" class="mui-btn mui-btn--primary mui-btn--raised"></input>
-    </form>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2 col-md-8 offset-md-2">
+            <h1>MoralAI</h1>
+            <form action="/" method="POST" id="main-form">
+                <input type="text" name="text" id="main-text-input" placeholdler="Give it a go..." value="{{ context["text"] }}"></input>
+                {% if "label" in context %}
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        <h2>{{ context["score"] }}</h2>
+                        {{ context["label"] }}
+                    </div>
+                    <div class="col-md-6 text-center">
+                <input type="submit" class="btn"></input>
+                    </div>
+                </div>
+                {% endif %}
+
+            </form>
+        </div>
+    </div>
 </div>
-{% if "label" in context %}
-<div>
-    {{ context["label"] }}
-</div>
-{% endif %}
 {% endblock %}

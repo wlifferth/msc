@@ -6,6 +6,7 @@ import pandas as pd
 import tensorflow as tf
 import warnings
 
+from collections import defaultdict
 from flask import Flask, render_template, url_for, request
 from tensorflow import keras
 from keras.preprocessing.text import Tokenizer
@@ -39,7 +40,7 @@ def load_tokenizer(tokenizer_file="models/tokenizer.pickle"):
 def predict(text):
     maxlen = 64
     model = load_model()
-    tokeniizer = load_tokenizer()
+    tokenizer = load_tokenizer()
     text_sequence = tokenizer.texts_to_sequences([text])
     padded_text_sequence = pad_sequences(text_sequence, padding='post', maxlen=maxlen)
     model_output = model.predict(padded_text_sequence)
@@ -63,48 +64,20 @@ def get_human_readable_label(score):
 def hello():
     """Return a friendly HTTP greeting."""
     css_url = url_for("static", filename="style.css")
-    context = {}
+    context = defaultdict(lambda: "")
     if request.method == "POST":
-        print("POST!")
-        output = predict(request.form["text"])
-        label = get_human_readable_label(output)
+        score = predict(request.form["text"])
+        label = get_human_readable_label(score)
         context["label"] = label
-        print(output)
+        context["text"] = request.form["text"]
+        context["score"] = score
     return render_template("home.html", css_url=css_url, context=context)
-
-@app.route('/api/classify', methods=["GET"])
-def get_obscenity():
-    # initialize the data dictionary that will be returned from the
-    # view
-    data = {"success": False}
-
-    # ensure an image was properly uploaded to our endpoint
-    if flask.request.method == "POST":
-        if not flask.request.json or not "text" in flask.request.json:
-            text = flask.request.json["text"]
-            model_output = predict
-            data["troll_score"] = [text]
-
-            # loop over the results and add them to the list of
-            # returned predictions
-            for (imagenetID, label, prob) in results[0]:
-                r = {"label": label, "probability": float(prob)}
-                data["predictions"].append(r)
-
-            # indicate that the request was a success
-            data["success"] = True
-
-    # return the data dictionary as a JSON response
-    return flask.jsonify(data)
 
 @app.errorhandler(500)
 def server_error(e):
     logging.exception('An error occurred during a request.')
-    return """
-    An internal error occurred: <pre>{}</pre>
-    See logs for full stacktrace.
-    """.format(e), 500
-
+    context = dict()
+    return render_template("error.html", error=e, css_url=css_url, context=context)
 
 if __name__ == "__main__":
     # This is used when running locally. Gunicorn is used to run the
