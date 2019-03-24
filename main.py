@@ -54,26 +54,6 @@ def predict(text):
     model_output = model.predict(padded_text_sequence)
     return model_output[0][0]
 
-def get_human_readable_moral_sentiment_label(score):
-    if score > 0.5:
-        return "Morally Salient"
-    else:
-        return "Not Morally Salient"
-
-def get_human_readable_confidence_label(score):
-    if score > 0.95:
-        return "(High Confidence)"
-    elif score > 0.7:
-        return "(Medium Confidence)"
-    elif score > 0.5:
-        return "(Low Confidence)"
-    elif score > 0.3:
-        return "(Low Confidence)"
-    elif score > 0.05:
-        return "(Medium Confidence)"
-    else:
-        return "(Low Confidence)"
-
 @app.route("/", methods=["GET", "POST"])
 def home():
     context = defaultdict(lambda: "")
