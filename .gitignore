@@ -5,4 +5,5 @@ models
 logs
 glove
 archive
+credentials
 __pycache__

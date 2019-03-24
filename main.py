@@ -18,7 +18,7 @@ from Sample import Sample
 
 app = Flask(__name__)
 
-with open("pyrebase.config") as pyrebase_config_file:
+with open("credentials/pyrebase.config") as pyrebase_config_file:
     pyrebase_config_json = json.load(pyrebase_config_file)
     firebase = pyrebase.initialize_app(pyrebase_config_json)
 
