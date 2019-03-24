@@ -1,13 +1,18 @@
 from datetime import datetime
 
 class Sample:
-    def __init__(self, text, prediction=None, labeled=False, label=None):
+    def __init__(self, text, prediction_score=None, label=None):
         self.text = text
-        self.prediction_score = prediction
-        self.labeled = labeled
-        if label is not None and label in (0, 1):
+        if prediction_score is not None:
+            self.prediction_score = float(prediction_score)
+        else:
+            self.prediction_score = None
+        if label is not None:
             self.labeled = True
-            self.label = label
+            self.label = float(label)
+        else:
+            self.labeled = False
+            self.label = None
         self.creation_datetime = datetime.now()
 
     def get_text_size_class(self):
@@ -50,3 +55,12 @@ class Sample:
             return "(Medium Confidence)"
         else:
             return "(Low Confidence)"
+
+    def get_firebase_dict(self):
+        firebase_dict = dict()
+        firebase_dict["text"] = self.text
+        firebase_dict["prediction_score"] = self.prediction_score
+        firebase_dict["labeled"] = self.labeled
+        firebase_dict["label"] = self.label
+        firebase_dict["creation_timestamp"] = self.creation_datetime.timestamp()
+        return firebase_dict

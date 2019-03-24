@@ -21,6 +21,7 @@ app = Flask(__name__)
 with open("credentials/pyrebase.json") as pyrebase_config_file:
     pyrebase_config_json = json.load(pyrebase_config_file)
     firebase = pyrebase.initialize_app(pyrebase_config_json)
+    db = firebase.database()
 
 nlp = None
 model = None
@@ -52,15 +53,19 @@ def predict(text):
     text_sequence = tokenizer.texts_to_sequences([text])
     padded_text_sequence = pad_sequences(text_sequence, padding='post', maxlen=maxlen)
     model_output = model.predict(padded_text_sequence)
-    return model_output[0][0]
+    return float(model_output[0][0])
+
+def write_sample_to_firebase(sample):
+    result = db.child("samples").push(sample.get_firebase_dict())
+    return result["name"]
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     context = defaultdict(lambda: "")
     if request.method == "POST":
-        sample = Sample(request.form["text"])
-        sample.prediction_score = predict(sample.text)
+        sample = Sample(request.form["text"], prediction_score=predict(request.form["text"]))
         context["sample"] = sample
+        write_sample_to_firebase(sample)
     return render_template("home.html", context=context)
 
 @app.errorhandler(500)
