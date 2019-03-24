@@ -3,23 +3,33 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-sm-8 offset-sm-2 col-md-8 offset-md-2">
+        <div class="col-sm-10 offset-sm-1 col-md-10 offset-md-1">
             <h1>MoralAI</h1>
             <form action="/" method="POST" id="main-form">
-                <input type="text" name="text" id="main-text-input" placeholdler="Give it a go..." value="{{ context["text"] }}"></input>
-                {% if "label" in context %}
-                <div class="row">
-                    <div class="col-md-6 text-center">
-                        <h2>{{ context["score"] }}</h2>
-                        {{ context["label"] }}
-                    </div>
-                    <div class="col-md-6 text-center">
-                <input type="submit" class="btn"></input>
-                    </div>
+                <div class="textarea-container">
+                    <textarea name="text" id="main-text-input">{{ context["text"] }}</textarea>
+                    <div class="textarea-size"></div>
                 </div>
-                {% endif %}
-
+                <div class="col-md-6 offset-md-3 text-center">
+                    <input type="submit" class="btn" value="Submit"></input>
+                </div>
             </form>
+            {% if "sample" in context %}
+            <div class="result-holder row">
+                <div class="col-sm-12 col-md-8">
+                    <p class="sample-text {{ context["sample"].get_text_size_class() }}">“
+                    {{ context["sample"].text }}
+                    ”</p>
+                </div>
+                <div class="col-sm-12 col-md-4 text-center">
+                    <div class="text-center human_readable_moral_sentiment_label" style="background-color: {{ context["sample"].get_label_color() }};">    
+                    {{ context["sample"].get_human_readable_moral_sentiment_label() }}
+                    </div>
+                <div class="text-center">
+                    {{ "{:0.4f}".format(context["sample"].prediction_score) }}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

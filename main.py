@@ -1,8 +1,10 @@
+import json
 import logging
 import numpy as np
 import os
-import pickle
 import pandas as pd
+import pickle
+import pyrebase
 import tensorflow as tf
 import warnings
 
@@ -12,8 +14,14 @@ from tensorflow import keras
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 
+from Sample import Sample
 
 app = Flask(__name__)
+
+with open("pyrebase.config") as pyrebase_config_file:
+    pyrebase_config_json = json.load(pyrebase_config_file)
+    firebase = pyrebase.initialize_app(pyrebase_config_json)
+
 nlp = None
 model = None
 tokenizer = None
@@ -46,32 +54,34 @@ def predict(text):
     model_output = model.predict(padded_text_sequence)
     return model_output[0][0]
 
-def get_human_readable_label(score):
-    if score > 0.9:
-        return "Morally Salient (High Confidence)"
-    elif score > 0.6:
-        return "Morally Salient (Medium Confidence)"
-    elif score > 0.5:
-        return "Morally Salient (Low Confidence)"
-    elif score > 0.4:
-        return "Not Morally Salient (Low Confidence)"
-    elif score > 0.1:
-        return "Not Morally Salient (Medium Confidence)"
+def get_human_readable_moral_sentiment_label(score):
+    if score > 0.5:
+        return "Morally Salient"
     else:
-        return "Not Morally Salient (Low Confidence)"
+        return "Not Morally Salient"
+
+def get_human_readable_confidence_label(score):
+    if score > 0.95:
+        return "(High Confidence)"
+    elif score > 0.7:
+        return "(Medium Confidence)"
+    elif score > 0.5:
+        return "(Low Confidence)"
+    elif score > 0.3:
+        return "(Low Confidence)"
+    elif score > 0.05:
+        return "(Medium Confidence)"
+    else:
+        return "(Low Confidence)"
 
 @app.route("/", methods=["GET", "POST"])
-def hello():
-    """Return a friendly HTTP greeting."""
-    css_url = url_for("static", filename="style.css")
+def home():
     context = defaultdict(lambda: "")
     if request.method == "POST":
-        score = predict(request.form["text"])
-        label = get_human_readable_label(score)
-        context["label"] = label
-        context["text"] = request.form["text"]
-        context["score"] = score
-    return render_template("home.html", css_url=css_url, context=context)
+        sample = Sample(request.form["text"])
+        sample.prediction_score = predict(sample.text)
+        context["sample"] = sample
+    return render_template("home.html", context=context)
 
 @app.errorhandler(500)
 def server_error(e):
