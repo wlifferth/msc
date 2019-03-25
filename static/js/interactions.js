@@ -14,34 +14,47 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Get the modal
+    var successModal = document.getElementById('feedback-success-modal');
+    var successModalX = document.getElementsByClassName("modal-close")[0];
+
+
     $("#positive-feedback").bind('click', function() {
         $.getJSON($SCRIPT_ROOT + '/_prediction_feedback', {
             sample_id: $('input[name="sample_id"]').val(),
             correct: true
         }, function(data) {
+            successModal.style.display = "block";
             console.log(data)
         });
         return false;
     });
-});
 
-document.addEventListener('DOMContentLoaded', function() {
     $("#negative-feedback").bind('click', function() {
         $.getJSON($SCRIPT_ROOT + '/_prediction_feedback', {
             sample_id: $('input[name="sample_id"]').val(),
             correct: false
         }, function(data) {
+            successModal.style.display = "block";
             console.log(data)
         });
         return false;
     });
-});
 
-document.addEventListener('DOMContentLoaded', function() {
     $('#main-text-input').keydown(function(event) {
         if (event.which == 13) {
             this.form.submit();
             event.preventDefault();
-         }
+        }
     });
+
+    successModalX.onclick = function() {
+        successModal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == successModal) {
+            successModal.style.display = "none";
+        }
+    }
 });
