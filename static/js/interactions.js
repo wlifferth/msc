@@ -36,3 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    $('#main-text-input').keydown(function(event) {
+        if (event.which == 13) {
+            this.form.submit();
+            event.preventDefault();
+         }
+    });
+});
