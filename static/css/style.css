@@ -9,6 +9,10 @@ body {
     padding: 10px;
 }
 
+a:hover {
+    cursor: pointer;
+}
+
 .row {
     padding: 20px;
 }
@@ -88,6 +92,7 @@ textarea {
     box-shadow: 0px 2px 5px -5px rgba(0,0,0,0.45);
     color: black;
     padding: 10px;
+    z-index: 1;
 }
 
 .sample-text {
@@ -120,10 +125,45 @@ textarea {
     border-radius: 30px;
     color: white;
     font-size: 14px;
-    display: block;
+    display: inline-block;
 }
 
 .ask-for-feedback-text {
     font-size:12px;
     color: #808080;
+}
+
+.feedback-container {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    -webkit-box-shadow: 0px 2px 5px -5px rgba(0,0,0,0.45);
+    -moz-box-shadow: 0px 2px 5px -5px rgba(0,0,0,0.45);
+    box-shadow: 0px 2px 5px -5px rgba(0,0,0,0.45);
+    color: black;
+    padding: 10px;
+    padding-top: 30px;
+    margin: 20px;
+    margin-top: -20px;
+}
+
+#positive-feedback {
+    padding: 12px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin: 10px;
+    background-color: #92AF94;
+    color: white;
+    border-radius: 30px;
+    display: block;
+}
+
+#negative-feedback {
+    padding: 12px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin: 10px;
+    background-color: #AC2C1B;
+    color: white;
+    border-radius: 30px;
+    display: block;
 }

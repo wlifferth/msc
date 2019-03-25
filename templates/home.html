@@ -23,10 +23,27 @@
                 </div>
                 <div class="col-sm-12 col-md-4 text-center">
                     <div class="text-center human_readable_moral_sentiment_label" style="background-color: {{ context["sample"].get_label_color() }};">    
-                    {{ context["sample"].get_human_readable_moral_sentiment_label() }}
+                        {{ context["sample"].get_human_readable_moral_sentiment_label() }}
                     </div>
-                <div class="text-center">
-                    {{ "{:0.4f}".format(context["sample"].prediction_score) }}
+                    <div class="text-center">
+                        {{ "{:0.4f}".format(context["sample"].prediction_score) }}
+                    </div>
+                </div>
+            </div>
+            <div class="feedback-container row">
+                <input type="hidden" id="sample_id" name="sample_id" value="{{ context["sample"].id }}">
+                <div class="col-xs-12 col-sm-12">
+                    <i>Did we get it right?</i>
+                </div>
+                <div class="col-xs-6 col-sm-6 text-center">
+                    <a href="#" class="btn" id="positive-feedback">
+                        Yup!
+                    </a>
+                </div>
+                <div class="col-xs-6 col-sm-6 text-center">
+                    <a href="#" class="btn" id="negative-feedback">
+                        No :(
+                    </a>
                 </div>
             </div>
             {% endif %}

@@ -9,7 +9,7 @@ import tensorflow as tf
 import warnings
 
 from collections import defaultdict
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, jsonify
 from tensorflow import keras
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -55,18 +55,50 @@ def predict(text):
     model_output = model.predict(padded_text_sequence)
     return float(model_output[0][0])
 
-def write_sample_to_firebase(sample):
+def push_sample_to_firebase(sample):
     result = db.child("samples").push(sample.get_firebase_dict())
     return result["name"]
+
+def update_sample_in_firebase(sample_id, sample):
+    result = db.child("samples").child(sample_id).update(sample.get_firebase_dict())
+    print("update result: ", result)
+
+def get_sample_from_firebase(sample_id):
+    sample_firebase_record = db.child("samples").child(sample_id).get().val()
+    return Sample.build_from_firebase_record(sample_firebase_record)
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     context = defaultdict(lambda: "")
     if request.method == "POST":
         sample = Sample(request.form["text"], prediction_score=predict(request.form["text"]))
+        sample.id = push_sample_to_firebase(sample)
         context["sample"] = sample
-        write_sample_to_firebase(sample)
     return render_template("home.html", context=context)
+
+@app.route("/_prediction_feedback")
+def register_prediction_feedback():
+    print("We got an ajax hit!!\n\n")
+    sample_id = request.args.get("sample_id", None, type=str)
+    correct = request.args.get("correct", None, type=bool)
+    if sample_id is None or correct is None:
+        return jsonify(success=False)
+    else:
+        sample = get_sample_from_firebase(sample_id)
+        if correct:
+            if sample.prediction_score > 0.5:
+                sample.label = 1
+            else:
+                sample.label = 0
+        else:
+            if sample.prediction_score > 0.5:
+                sample.label = 0
+            else:
+                sample.label = 1
+        sample.labeled = True
+        update_sample_in_firebase(sample_id, sample)
+        return jsonify(success=True)
+
 
 @app.errorhandler(500)
 def server_error(e):

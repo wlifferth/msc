@@ -1,7 +1,7 @@
 from datetime import datetime
 
 class Sample:
-    def __init__(self, text, prediction_score=None, label=None):
+    def __init__(self, text, prediction_score=None, label=None, creation_datetime=None):
         self.text = text
         if prediction_score is not None:
             self.prediction_score = float(prediction_score)
@@ -13,7 +13,10 @@ class Sample:
         else:
             self.labeled = False
             self.label = None
-        self.creation_datetime = datetime.now()
+        if creation_datetime is not None:
+            self.creation_datetime = creation_datetime
+        else:
+            self.creation_datetime = datetime.now()
 
     def get_text_size_class(self):
         if len(self.text) < 20:
@@ -64,3 +67,17 @@ class Sample:
         firebase_dict["label"] = self.label
         firebase_dict["creation_timestamp"] = self.creation_datetime.timestamp()
         return firebase_dict
+
+    @staticmethod
+    def build_from_firebase_record(sample_firebase_record):
+        text = sample_firebase_record["text"]
+        if "prediction_score" in sample_firebase_record:
+            prediction_score = sample_firebase_record["prediction_score"]
+        else:
+            prediction_score = None
+        if "label" in sample_firebase_record:
+            label = sample_firebase_record["label"]
+        else:
+            label = None
+        creation_datetime = datetime.fromtimestamp(sample_firebase_record["creation_timestamp"])
+        return Sample(text=text, prediction_score=prediction_score, label=label, creation_datetime=creation_datetime)
