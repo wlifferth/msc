@@ -32,6 +32,8 @@
             </div>
             <div class="feedback-container row">
                 <input type="hidden" id="sample_id" name="sample_id" value="{{ context["sample"].id }}">
+                <input type="hidden" id="prev_sample_text" name="prev_sample_text" value="{{ context["sample"].text }}">
+                <input type="hidden" id="prev_sample_prediction" name="prev_sample_prediction" value="{{ context["sample"].prediction_score }}">
                 <div class="col-xs-12 col-sm-2 ask-for-feedback-text">
                     <i>Did we get it right?</i>
                 </div>

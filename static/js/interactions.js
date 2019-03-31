@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
     $("#positive-feedback").bind('click', function() {
         $.getJSON($SCRIPT_ROOT + '/_prediction_feedback', {
             sample_id: $('input[name="sample_id"]').val(),
+            sample_text: $('input[name="prev_sample_text"]').val(),
+            sample_prediction: $('input[name="prev_sample_prediction"]').val(),
             correct: true
         }, function(data) {
             successModal.style.display = "block";
@@ -33,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
     $("#negative-feedback").bind('click', function() {
         $.getJSON($SCRIPT_ROOT + '/_prediction_feedback', {
             sample_id: $('input[name="sample_id"]').val(),
+            sample_text: $('input[name="prev_sample_text"]').val(),
+            sample_prediction: $('input[name="prev_sample_prediction"]').val(),
             correct: false
         }, function(data) {
             successModal.style.display = "block";

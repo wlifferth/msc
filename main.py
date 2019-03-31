@@ -95,33 +95,33 @@ def home():
     context = defaultdict(lambda: "")
     if request.method == "POST":
         sample = Sample(request.form["text"], prediction_score=predict(request.form["text"]))
-        sample.id = push_sample_to_firebase(sample)
         context["sample"] = sample
     return render_template("home.html", context=context)
 
 @app.route("/_prediction_feedback")
 def register_prediction_feedback():
-    sample_id = request.args.get("sample_id", None, type=str)
-    correct = request.args.get("correct", None, type=bool)
-    if sample_id is None or correct is None:
+    try:
+        sample_text = request.args.get("sample_text", None, type=str)
+        sample_prediction = request.args.get("sample_prediction", None, type=float)
+        sample = Sample(sample_text, prediction_score=sample_prediction)
+        correct = request.args.get("correct", None, type=bool)
+    except:
         return jsonify(success=False)
     else:
-        sample = get_sample_from_firebase(sample_id)
         if correct:
-            if sample.prediction_score > 0.5:
+            if sample_prediction > 0.5:
                 sample.label = 1
             else:
                 sample.label = 0
         else:
-            if sample.prediction_score > 0.5:
+            if sample_prediction > 0.5:
                 sample.label = 0
             else:
                 sample.label = 1
         sample.labeled = True
-        update_sample_in_firebase(sample_id, sample)
-        train_single(sample.text, sample.label)
+        push_sample_to_firebase(sample)
+        # train_single(sample.text, sample.label)
         return jsonify(success=True)
-
 
 @app.errorhandler(500)
 def server_error(e):
