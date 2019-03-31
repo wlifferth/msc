@@ -11,10 +11,12 @@ import warnings
 from collections import defaultdict
 from flask import Flask, render_template, url_for, request, jsonify
 from tensorflow import keras
+from keras import backend as K
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 
 from Sample import Sample
+from recall_metric import recall_metric
 
 app = Flask(__name__)
 
@@ -26,6 +28,7 @@ with open("credentials/pyrebase.json") as pyrebase_config_file:
 nlp = None
 model = None
 tokenizer = None
+graph = None
 
 def load_model(model_file="models/msa_model.json", weights_file="models/msa_weights.hdf"):
     global model
@@ -37,6 +40,8 @@ def load_model(model_file="models/msa_model.json", weights_file="models/msa_weig
         model = keras.models.model_from_json(loaded_model_json)
         # load weights into new model
         model.load_weights(weights_file)
+        global graph
+        graph = tf.get_default_graph()
     return model
 
 def load_tokenizer(tokenizer_file="models/tokenizer.pickle"):
@@ -47,13 +52,31 @@ def load_tokenizer(tokenizer_file="models/tokenizer.pickle"):
     return tokenizer
 
 def predict(text):
-    maxlen = 64
+    global graph
     model = load_model()
-    tokenizer = load_tokenizer()
-    text_sequence = tokenizer.texts_to_sequences([text])
-    padded_text_sequence = pad_sequences(text_sequence, padding='post', maxlen=maxlen)
-    model_output = model.predict(padded_text_sequence)
-    return float(model_output[0][0])
+    with graph.as_default():
+        maxlen = 64
+        tokenizer = load_tokenizer()
+        text_sequence = tokenizer.texts_to_sequences([text])
+        padded_text_sequence = pad_sequences(text_sequence, padding='post', maxlen=maxlen)
+        model_output = model.predict(padded_text_sequence)
+        return float(model_output[0][0])
+
+def train_single(text, label):
+    global graph
+    model = load_model()
+    with graph.as_default():
+        maxlen = 64
+        model.compile(optimizer='adam', loss='binary_crossentropy')
+        tokenizer = load_tokenizer()
+        text_sequence = tokenizer.texts_to_sequences([text])
+        padded_text_sequence = pad_sequences(text_sequence, padding='post', maxlen=maxlen)
+        model_label = np.array([[float(label)]])
+        model.fit(padded_text_sequence, model_label,
+                        epochs=1,
+                        verbose=0,
+                        batch_size=1,
+                        class_weight={1: 10, 0: 1})
 
 def push_sample_to_firebase(sample):
     result = db.child("samples").push(sample.get_firebase_dict())
@@ -78,7 +101,6 @@ def home():
 
 @app.route("/_prediction_feedback")
 def register_prediction_feedback():
-    print("We got an ajax hit!!\n\n")
     sample_id = request.args.get("sample_id", None, type=str)
     correct = request.args.get("correct", None, type=bool)
     if sample_id is None or correct is None:
@@ -97,6 +119,7 @@ def register_prediction_feedback():
                 sample.label = 1
         sample.labeled = True
         update_sample_in_firebase(sample_id, sample)
+        train_single(sample.text, sample.label)
         return jsonify(success=True)
 
 
