@@ -104,7 +104,7 @@ pytz==2018.9
 PyYAML==3.13
 requests==2.11.1
 requests-toolbelt==0.7.0
-rsa==4.0
+rsa==4.7
 ruamel-yaml==0.15.46
 scipy==1.2.1
 six==1.12.0
