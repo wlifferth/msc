@@ -31,7 +31,7 @@ decorator==4.3.2
 distributed==1.26.0
 firebase-admin==2.16.0
 Flask==1.0.2
-Flask-Cors==3.0.7
+Flask-Cors==3.0.9
 gast==0.2.2
 gcloud==0.17.0
 google-api-core==1.8.2
