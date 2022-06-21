@@ -70,7 +70,7 @@ nbformat==4.4.0
 networkx==2.2
 numba==0.42.0
 numexpr==2.6.9
-numpy==1.16.2
+numpy==1.22.0
 oauth2client==3.0.0
 odo==0.5.0
 olefile==0.46
