@@ -99,7 +99,7 @@ pytest-doctestplus==0.3.0
 pytest-openfiles==0.3.2
 pytest-remotedata==0.3.1
 python-dateutil==2.8.0
-python-jwt==2.0.1
+python-jwt==3.3.4
 pytz==2018.9
 PyYAML==3.13
 requests==2.11.1
